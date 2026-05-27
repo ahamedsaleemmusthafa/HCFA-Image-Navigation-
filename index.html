@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCFA Healthcare Form Training</title>
+    <style>
+        /* Base Reset & Layout */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            color: #333;
+        }
+
+        /* Top Banner Styles */
+        .top-banner {
+            background-color: #2c3e50;
+            color: #ffffff;
+            padding: 15px 20px 10px 20px; /* Adjusted bottom padding */
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+        }
+
+        /* Watermark Subtitle Style */
+        .banner-subtitle {
+            font-size: 11px;
+            font-weight: normal;
+            color: #bdc3c7;
+            margin-top: 5px;
+            display: block;
+            letter-spacing: 1px;
+        }
+
+        /* Main Workspace Container */
+        .container {
+            display: flex;
+            width: 100%;
+            flex: 1; /* Fills the rest of the height below the banner */
+            overflow: hidden;
+        }
+
+        /* CRITICAL: Image Positioning Container */
+        /* Keeps image native width/height locked so coordinates match 1:1 */
+        .form-container {
+            position: relative;
+            flex: 0 0 940px; /* Locks width to prevent image rescaling */
+            height: 100%;
+            overflow: auto;
+            background-color: #eef2f5;
+            padding: 18px 10px 10px 10px;
+            box-sizing: border-box;
+            border-right: 2px solid #cfd8dc;
+        }
+
+        #ub-form {
+            display: block;
+            width: 920px;  /* Matches your coordinates exact width */
+            height: 1200px; /* Matches your coordinates exact height */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            background: #fff;
+        }
+
+        /* Right Side Dashboard Panel */
+        .dashboard-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            height: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .panel-content {
+            padding: 30px;
+        }
+
+        /* Screen States */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+
+        /* Typography & Components */
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 24px;
+            border-bottom: 2px solid #eceff1;
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #27ae60;
+        }
+        .btn-retry {
+            background: #3498db;
+        }
+        .btn-retry:hover {
+            background: #2980b9;
+        }
+
+        /* Game Elements */
+        #box-list {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        #box-list li {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 6px;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.1);
+        }
+
+        /* Timer Progress Bar */
+        .timer-container {
+            width: 100%;
+            background: #e2e8f0;
+            height: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background: #2ecc71;
+            transition: width 0.1s linear, background-color 0.3s;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-box {
+            background: #edf2f7;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .stat-box span {
+            display: block;
+            font-size: 22px;
+            color: #2b6cb0;
+            margin-top: 4px;
+        }
+
+        /* Review Lists */
+        .bordered-list {
+            padding: 0;
+            list-style: none;
+        }
+        .bordered-list li {
+            border: 1px solid #cbd5e0;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        /* Image Map Area Highlights */
+        area {
+            outline: none;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeInEffect 0.4s ease-out;
+        }
+        @keyframes fadeInEffect {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-banner">
+        HCFA Healthcare Form Training
+        <span class="banner-subtitle">Created by Saleem</span>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <img src="HCFA.jpg" usemap="#image-map" id="ub-form" alt="HCFA Healthcare Form">
+            <map name="image-map">
+                <area alt="Box 1 - Plan Type" title="Box 1 - Plan Type" href="#" coords="28,144,561,184" shape='rect' data-box="Box 1 - Plan Type">
+                <area alt="Box 1a - Insured's I.D. Number" title="Box 1a - Insured's I.D. Number" href="#" coords="562,145,893,184" shape='rect' data-box="Box 1a - Insured's I.D. Number">
+                <area alt="Box 2 - Patient's Name" title="Box 2 - Patient's Name" href="#" coords="31,183,343,218" shape='rect' data-box="Box 2 - Patient's Name">
+                <area alt="Box 3 - Patient's Birth Date, Gender" title="Box 3 - Patient's Birth Date, Gender" href="#" coords="344,182,563,218" shape='rect' data-box="Box 3 - Patient's Birth Date, Gender">
+                <area alt="Box 4 - Insured's Name" title="Box 4 - Insured's Name" href="#" coords="562,184,892,217" shape='rect' data-box="Box 4 - Insured's Name">
+                <area alt="Box 5 - Patient's Address" title="Box 5 - Patient's Address" href="#" coords="31,217,341,328" shape='rect' data-box="Box 5 - Patient's Address">
+                <area alt="Box 6 - Patient Relationship to Insured" title="Box 6 - Patient Relationship to Insured" href="#" coords="342,217,562,254" shape='rect' data-box="Box 6 - Patient Relationship to Insured">
+                <area alt="Box 7 - Insured's Address" title="Box 7 - Insured's Address" href="#" coords="559,217,892,327" shape='rect' data-box="Box 7 - Insured's Address">
+                <area alt="Box 8 - Reserved for NUCC Use" title="Box 8 - Reserved for NUCC Use" href="#" coords="343,255,560,327" shape='rect' data-box="Box 8 - Reserved for NUCC Use">
+                <area alt="Box 9 - Other Insured's Name" title="Box 9 - Other Insured's Name" href="#" coords="28,328,343,362" shape='rect' data-box="Box 9 - Other Insured's Name">
+                <area alt="Box 9a - Other Insured's Policy or Group Number" title="Box 9a - Other Insured's Policy or Group Number" href="#" coords="28,363,343,396" shape='rect' data-box="Box 9a - Other Insured's Policy or Group Number">
+                <area alt="Box 9b - Reserved for NUCC Use" title="Box 9b - Reserved for NUCC Use" href="#" coords="28,397,341,437" shape='rect' data-box="Box 9b - Reserved for NUCC Use">
+                <area alt="Box 9c - Reserved for NUCC Use" title="Box 9c - Reserved for NUCC Use" href="#" coords="29,438,343,473" shape='rect' data-box="Box 9c - Reserved for NUCC Use">
+                <area alt="Box 9d - Insurance Plan Name or Program Name" title="Box 9d - Insurance Plan Name or Program Name" href="#" coords="30,473,342,509" shape='rect' data-box="Box 9d - Insurance Plan Name or Program Name">
+                <area alt="Box 10a, 10b, &amp; 10c - Is Patient's Condition" title="Box 10a, 10b, &amp; 10c - Is Patient's Condition" href="#" coords="341,329,560,473" shape='rect' data-box="Box 10a, 10b, &amp; 10c - Is Patient's Condition">
+                <area alt="Box 10d - Claim Codes" title="Box 10d - Claim Codes" href="#" coords="342,471,562,510" shape='rect' data-box="Box 10d - Claim Codes">
+                <area alt="Box 11 - Insured's Policy, Group, or FECA Number" title="Box 11 - Insured's Policy, Group, or FECA Number" href="#" coords="560,329,892,362" shape='rect' data-box="Box 11 - Insured's Policy, Group, or FECA Number">
+                <area alt="Box 11a - Insured's Date of Birth, Gender" title="Box 11a - Insured's Date of Birth, Gender" href="#" coords="561,364,894,400" shape='rect' data-box="Box 11a - Insured's Date of Birth, Gender">
+                <area alt="Box 11b - Other Claim ID" title="Box 11b - Other Claim ID" href="#" coords="562,402,892,437" shape='rect' data-box="Box 11b - Other Claim ID">
+                <area alt="Box 11c - Insurance Plan Name or Program Name" title="Box 11c - Insurance Plan Name or Program Name" href="#" coords="560,437,892,473" shape='rect' data-box="Box 11c - Insurance Plan Name or Program Name">
+                <area alt="Box 11d - Is there another Health Benefit Plan" title="Box 11d - Is there another Health Benefit Plan" href="#" coords="560,470,892,509" shape='rect' data-box="Box 11d - Is there another Health Benefit Plan">
+                <area alt="Box 12 - Patient's or Authorized Person's Signature" title="Box 12 - Patient's or Authorized Person's Signature" href="#" coords="29,508,560,580" shape='rect' data-box="Box 12 - Patient's or Authorized Person's Signature">
+                <area alt="Box 13 - Insured's or Authorized Person's Signature" title="Box 13 - Insured's or Authorized Person's Signature" href="#" coords="560,509,892,583" shape='rect' data-box="Box 13 - Insured's or Authorized Person's Signature">
+                <area alt="Box 14 - Date of Current Illness" title="Box 14 - Date of Current Illness" href="#" coords="28,584,160,620" shape='rect' data-box="Box 14 - Date of Current Illness">
+                <area alt="Box 15 - Other Date" title="Box 15 - Other Date" href="#" coords="321,584,561,617" shape='rect' data-box="Box 15 - Other Date">
+                <area alt="Box 16 - Dates Patient Unable to Work in Current Occupation" title="Box 16 - Dates Patient Unable to Work in Current Occupation" href="#" coords="561,583,893,617" shape='rect' data-box="Box 16 - Dates Patient Unable to Work in Current Occupation">
+                <area alt="Box 17 - Name of Referring Provider or Other Source" title="Box 17 - Name of Referring Provider or Other Source" href="#" coords="29,620,320,654" shape='rect' data-box="Box 17 - Name of Referring Provider or Other Source">
+                <area alt="Box 17a - Other ID" title="Box 17a - Other ID" href="#" coords="320,617,561,636" shape='rect' data-box="Box 17a - Other ID">
+                <area alt="Box 17b - NPI " title="Box 17b - NPI " href="#" coords="323,638,560,653" shape='rect' data-box="Box 17b - NPI ">
+                <area alt="Box 18 - Hospitalization Dates Related to Current Services" title="Box 18 - Hospitalization Dates Related to Current Services" href="#" coords="559,621,892,653" shape='rect' data-box="Box 18 - Hospitalization Dates Related to Current Services">
+                <area alt="Box 19 - Additional Claim Information" title="Box 19 - Additional Claim Information" href="#" coords="28,654,562,690" shape='rect' data-box="Box 19 - Additional Claim Information">
+                <area alt="Box 20 - Outside Lab and Charges" title="Box 20 - Outside Lab and Charges" href="#" coords="562,654,893,690" shape='rect' data-box="Box 20 - Outside Lab and Charges">
+                <area alt="Box 21 - Diagnosis or Nature of Illness or Injury" title="Box 21 - Diagnosis or Nature of Illness or Injury" href="#" coords="29,690,561,765" shape='rect' data-box="Box 21 - Diagnosis or Nature of Illness or Injury">
+                <area alt="Box 22 - Resubmission Code and Original Ref. No." title="Box 22 - Resubmission Code and Original Ref. No." href="#" coords="561,691,892,729" shape='rect' data-box="Box 22 - Resubmission Code and Original Ref. No.">
+                <area alt="Box 23 - Prior Authorization Number" title="Box 23 - Prior Authorization Number" href="#" coords="561,730,892,765" shape='rect' data-box="Box 23 - Prior Authorization Number">
+                <area alt="Box 24 - Service Lines" title="Box 24 - Service Lines" href="#" coords="30,766,894,1016" shape='rect' data-box="Box 24 - Service Lines">
+                <area alt="Box 25 - Federal Tax ID Number" title="Box 25 - Federal Tax ID Number" href="#" coords="30,1018,267,1054" shape='rect' data-box="Box 25 - Federal Tax ID Number">
+                <area alt="Box 26 - Patient's Account No." title="Box 26 - Patient's Account No." href="#" coords="267,1018,425,1054" shape='rect' data-box="Box 26 - Patient's Account No.">
+                <area alt="Box 27 - Accept Assignment" title="Box 27 - Accept Assignment" href="#" coords="428,1015,562,1053" shape='rect' data-box="Box 27 - Accept Assignment">
+                <area alt="Box 28 - Total Charge" title="Box 28 - Total Charge" href="#" coords="563,1018,683,1053" shape='rect' data-box="Box 28 - Total Charge">
+                <area alt="Box 29 - Amount Paid" title="Box 29 - Amount Paid" href="#" coords="686,1019,789,1056" shape='rect' data-box="Box 29 - Amount Paid">
+                <area alt="Box 30 - Reserved for NUCC Use" title="Box 30 - Reserved for NUCC Use" href="#" coords="788,1018,892,1053" shape='rect' data-box="Box 30 - Reserved for NUCC Use">
+                <area alt="Box 31 - Signature of Physician or Supplier Including Degrees or Credentials" title="Box 31 - Signature of Physician or Supplier Including Degrees or Credentials" href="#" coords="31,1056,268,1144" shape='rect' data-box="Box 31 - Signature of Physician or Supplier Including Degrees or Credentials">
+                <area alt="Box 32 - Service Facility Location Information" title="Box 32 - Service Facility Location Information" href="#" coords="268,1055,562,1124" shape='rect' data-box="Box 32 - Service Facility Location Information">
+                <area alt="Box 32a - NPI" title="Box 32a - NPI" href="#" coords="267,1125,394,1145" shape='rect' data-box="Box 32a - NPI">
+                <area alt="Box 32b - Other ID" title="Box 32b - Other ID" href="#" coords="394,1124,561,1145" shape='rect' data-box="Box 32b - Other ID">
+                <area alt="Box 33 - Billing Provider Info &amp; Ph" title="Box 33 - Billing Provider Info &amp; Ph" href="#" coords="562,1056,892,1125" shape='rect' data-box="Box 33 - Billing Provider Info &amp; Ph">
+                <area alt="Box 33a - NPI" title="Box 33a - NPI" href="#" coords="563,1125,686,1145" shape='rect' data-box="Box 33a - NPI">
+                <area alt="Box 33b - Other ID" title="Box 33b - Other ID" href="#" coords="686,1126,893,1148" shape='rect' data-box="Box 33b - Other ID">
+                <area alt="Box 14 - Qualifier" title="Box 14 - Qualifier" href="#" coords="160,584,320,618" shape='rect' data-box="Box 14 - Qualifier">
+                <area alt="Box 21- Indicator" title="Box 21- Indicator" href="#" coords="435,692,561,716" shape='rect' data-box="Box 21- Indicator">
+            </map>
+        </div>
+
+        <div class="dashboard-panel">
+            <div class="panel-content">
+                
+                <div id="setup-screen" class="screen active fade-in">
+                    <h2>📋 Challenge Settings</h2>
+                    <div class="card">
+                        <div class="form-group">
+                            <label for="input-questions">Number of Fields to Quiz:</label>
+                            <input type="number" id="input-questions" value="10" min="1" max="51">
+                        </div>
+                        <div class="form-group">
+                            <label for="input-timer">Seconds Per Field:</label>
+                            <input type="number" id="input-timer" value="15" min="3" max="60">
+                        </div>
+                        <button id="start-game-btn" class="btn">Launch Simulator</button>
+                    </div>
+                </div>
+
+                <div id="game-screen" class="screen fade-in">
+                    <h2>🎯 Find This Field:</h2>
+                    <ul id="box-list"></ul>
+                    
+                    <div class="timer-container">
+                        <div id="timer-bar"></div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-box">Score <span id="score">0</span></div>
+                        <div class="stat-box">Remaining <span id="attempts">0</span></div>
+                        <div class="stat-box">Streak 🔥 <span id="streak" style="color: #e67e22;">0</span></div>
+                        <div class="stat-box">Time Left <span id="time-text">0s</span></div>
+                    </div>
+                </div>
+
+                <div id="results-screen" class="screen fade-in">
+                    <h2>📊 Performance Summary</h2>
+                    <div id="results-content"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const boxNames = [
+    "Box 1 - Plan Type",
+    "Box 1a - Insured's I.D. Number",
+    "Box 2 - Patient's Name",
+    "Box 3 - Patient's Birth Date, Gender",
+    "Box 4 - Insured's Name",
+    "Box 5 - Patient's Address",
+    "Box 6 - Patient Relationship to Insured",
+    "Box 7 - Insured's Address",
+    "Box 8 - Reserved for NUCC Use",
+    "Box 9 - Other Insured's Name",
+    "Box 9a - Other Insured's Policy or Group Number",
+    "Box 9b - Reserved for NUCC Use",
+    "Box 9c - Reserved for NUCC Use",
+    "Box 9d - Insurance Plan Name or Program Name",
+    "Box 10a, 10b, &amp; 10c - Is Patient's Condition",
+    "Box 10d - Claim Codes",
+    "Box 11 - Insured's Policy, Group, or FECA Number",
+    "Box 11a - Insured's Date of Birth, Gender",
+    "Box 11b - Other Claim ID",
+    "Box 11c - Insurance Plan Name or Program Name",
+    "Box 11d - Is there another Health Benefit Plan",
+    "Box 12 - Patient's or Authorized Person's Signature",
+    "Box 13 - Insured's or Authorized Person's Signature",
+    "Box 14 - Date of Current Illness",
+    "Box 15 - Other Date",
+    "Box 16 - Dates Patient Unable to Work in Current Occupation",
+    "Box 17 - Name of Referring Provider or Other Source",
+    "Box 17a - Other ID",
+    "Box 17b - NPI ",
+    "Box 18 - Hospitalization Dates Related to Current Services",
+    "Box 19 - Additional Claim Information",
+    "Box 20 - Outside Lab and Charges",
+    "Box 21 - Diagnosis or Nature of Illness or Injury",
+    "Box 22 - Resubmission Code and Original Ref. No.",
+    "Box 23 - Prior Authorization Number",
+    "Box 24 - Service Lines",
+    "Box 25 - Federal Tax ID Number",
+    "Box 26 - Patient's Account No.",
+    "Box 27 - Accept Assignment",
+    "Box 28 - Total Charge",
+    "Box 29 - Amount Paid",
+    "Box 30 - Reserved for NUCC Use",
+    "Box 31 - Signature of Physician or Supplier Including Degrees or Credentials",
+    "Box 32 - Service Facility Location Information",
+    "Box 32a - NPI",
+    "Box 32b - Other ID",
+    "Box 33 - Billing Provider Info &amp; Ph",
+    "Box 33a - NPI",
+    "Box 33b - Other ID",
+    "Box 14 - Qualifier",
+    "Box 21- Indicator"
+];
+
+        // Screens
+        const setupScreen = document.getElementById('setup-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const resultsScreen = document.getElementById('results-screen');
+
+        // Dynamic Elements
+        const boxList = document.getElementById('box-list');
+        const scoreElement = document.getElementById('score');
+        const attemptsElement = document.getElementById('attempts');
+        const streakElement = document.getElementById('streak');
+        const timeText = document.getElementById('time-text');
+        const timerBar = document.getElementById('timer-bar');
+        const resultsContent = document.getElementById('results-content');
+
+        // Config Controls
+        let maxAttempts = 10;
+        let timePerQuestion = 15; // default seconds
+        
+        // State Engines
+        let quizPool = [];
+        let currentBoxName = '';
+        let score = 0;
+        let attempts = 0;
+        let currentStreak = 0;
+        let startTime = 0;
+        
+        // Timer intervals
+        let questionTimerInterval = null;
+        let timeRemaining = 0;
+
+        const wrongClicks = [];
+        const correctClicks = [];
+        let redBox = null;
+
+        // Native Synth Sound Engine
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                if (type === 'correct') {
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    osc.frequency.exponentialRampToValueAtTime(783.99, audioCtx.currentTime + 0.08); // G5
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+                } else {
+                    osc.frequency.setValueAtTime(220.00, audioCtx.currentTime); // A3
+                    osc.frequency.linearRampToValueAtTime(130.81, audioCtx.currentTime + 0.18); // C3
+                    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+                    osc.start(); osc.stop(audioCtx.currentTime + 0.22);
+                }
+            } catch(e) {}
+        }
+
+        // Shuffler
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        // Interactive UI Micro-Interactions (Floating Feedback)
+        function spawnFeedback(e, isCorrect) {
+            const feedback = document.createElement('div');
+            feedback.innerText = isCorrect ? '👍' : '👎';
+            feedback.style.position = 'absolute';
+            feedback.style.left = `${e.pageX - 15}px`;
+            feedback.style.top = `${e.pageY - 15}px`;
+            feedback.style.fontSize = '34px';
+            feedback.style.pointerEvents = 'none';
+            feedback.style.zIndex = '2000';
+            feedback.style.transition = 'all 0.6s ease-out';
+            feedback.style.filter = isCorrect ? 'drop-shadow(0px 0px 5px #2ecc71)' : 'drop-shadow(0px 0px 5px #e74c3c)';
+            
+            document.body.appendChild(feedback);
+
+            requestAnimationFrame(() => {
+                feedback.style.transform = 'translateY(-50px) scale(1.3)';
+                feedback.style.opacity = '0';
+            });
+            setTimeout(() => feedback.remove(), 600);
+        }
+
+        // Start Setup Handler
+        document.getElementById('start-game-btn').addEventListener('click', function() {
+            const qInput = parseInt(document.getElementById('input-questions').value);
+            const tInput = parseInt(document.getElementById('input-timer').value);
+
+            maxAttempts = isNaN(qInput) ? 10 : Math.min(Math.max(qInput, 1), 51);
+            timePerQuestion = isNaN(tInput) ? 15 : Math.min(Math.max(tInput, 3), 60);
+
+            // Populate unique subset targets
+            quizPool = shuffleArray([...boxNames]).slice(0, maxAttempts);
+            
+            setupScreen.classList.remove('active');
+            gameScreen.classList.add('active');
+            
+            startTime = Date.now();
+            showNextQuestion();
+        });
+
+        function showNextQuestion() {
+            clearInterval(questionTimerInterval);
+            if (attempts >= maxAttempts) {
+                displayResults();
+                return;
+            }
+
+            currentBoxName = quizPool[attempts];
+            boxList.innerHTML = `<li class="fade-in">${currentBoxName}</li>`;
+            
+            attemptsElement.textContent = maxAttempts - attempts;
+            scoreElement.textContent = score;
+            streakElement.textContent = currentStreak;
+
+            initQuestionTimer();
+        }
+
+        // Running Per-Question Countdown Engine
+        function initQuestionTimer() {
+            timeRemaining = timePerQuestion;
+            timeText.textContent = `${timeRemaining}s`;
+            timerBar.style.width = '100%';
+            timerBar.style.backgroundColor = '#2ecc71';
+
+            questionTimerInterval = setInterval(() => {
+                timeRemaining--;
+                timeText.textContent = `${timeRemaining}s`;
+                
+                // Track bar length reduction percentage
+                let percentage = (timeRemaining / timePerQuestion) * 100;
+                timerBar.style.width = `${percentage}%`;
+
+                if (percentage < 30) {
+                    timerBar.style.backgroundColor = '#e74c3c'; // Turns red on warning low
+                } else if (percentage < 60) {
+                    timerBar.style.backgroundColor = '#f1c40f'; // Yellow
+                }
+
+                if (timeRemaining <= 0) {
+                    clearInterval(questionTimerInterval);
+                    handleFailure(null, true); // Process timeout fail state
+                }
+            }, 1000);
+        }
+
+        function checkBoxSelection(name, clickEvent) {
+            clearInterval(questionTimerInterval);
+            const isCorrect = (name === currentBoxName);
+            
+            if (isCorrect) {
+                playSound('correct');
+                if(clickEvent) spawnFeedback(clickEvent, true);
+                score++;
+                currentStreak++;
+                correctClicks.push({ name: currentBoxName });
+            } else {
+                handleFailure(clickEvent, false);
+                return;
+            }
+
+            attempts++;
+            showNextQuestion();
+        }
+
+        function handleFailure(clickEvent, isTimeout) {
+            playSound('wrong');
+            if (clickEvent && !isTimeout) spawnFeedback(clickEvent, false);
+            
+            currentStreak = 0;
+            wrongClicks.push({ 
+                correct: currentBoxName, 
+                reason: isTimeout ? 'Timed out' : 'Incorrect Selection' 
+            });
+
+            attempts++;
+            showNextQuestion();
+        }
+
+        function displayResults() {
+            clearInterval(questionTimerInterval);
+            gameScreen.classList.remove('active');
+            resultsScreen.classList.add('active');
+
+            const elapsedTotal = ((Date.now() - startTime) / 1000).toFixed(1);
+            const finalPercentage = ((score / maxAttempts) * 100).toFixed(1);
+
+            let wrongSummaryHtml = "<h3 style='color:#e74c3c; margin-top:20px;'>❌ Areas For Review:</h3><ul class='bordered-list'>";
+            wrongClicks.forEach((item, index) => {
+                wrongSummaryHtml += `
+                    <li id="review-item-${index}" style="cursor:pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fdf2f2'" onmouseout="this.style.backgroundColor='#fff'">
+                        🔍 <b>${item.correct}</b> <span style="color:#7f8c8d; font-size:12px;">(${item.reason} - Click to check location)</span>
+                    </li>`;
+            });
+            wrongSummaryHtml += "</ul>";
+
+            let correctSummaryHtml = "<h3 style='color:#2ecc71; margin-top:20px;'>✅ Mastered Fields:</h3><ul class='bordered-list'>";
+            correctClicks.forEach((item) => {
+                correctSummaryHtml += `<li>Item Located: <b>${item.name}</b></li>`;
+            });
+            correctSummaryHtml += "</ul>";
+
+            resultsContent.innerHTML = `
+                <div class="card" style="text-align:center;">
+                    <p style="font-size: 24px; margin:0 0 10px 0;">🎉 Evaluation Complete!</p>
+                    <p style="font-size: 38px; font-weight:bold; color:#2980b9; margin:10px 0;">${finalPercentage}%</p>
+                    <p>Accurately checked <b>${score}</b> out of <b>${maxAttempts}</b> total target items.</p>
+                    <p style="color:#7f8c8d;">Total operational time: ${elapsedTotal} seconds.</p>
+                    <button id="reload-app-btn" class="btn btn-retry" style="margin-top:10px;">Configure New Session</button>
+                </div>
+                ${wrongClicks.length > 0 ? wrongSummaryHtml : "<p style='color:#2ecc71; font-weight:bold; font-size:18px; text-align:center;'>🎯 Perfect Score! Your accuracy profile is exemplary.</p>"}
+                ${correctClicks.length > 0 ? correctSummaryHtml : ""}
+            `;
+
+            document.getElementById('reload-app-btn').addEventListener('click', () => {
+                location.reload();
+            });
+
+            // Re-register click mapping for highlighting historical mistakes
+            wrongClicks.forEach((item, index) => {
+                document.getElementById(`review-item-${index}`).addEventListener('click', function() {
+                    highlightCorrectBox(item.correct);
+                });
+            });
+        }
+
+        // Coordinates Border Drawer Function
+        function createRedBox(coords) {
+            removeRedBox(); // remove existing
+            const [left, top, right, bottom] = coords.split(',').map(Number);
+            
+            redBox = document.createElement('div');
+            redBox.style.position = 'absolute';
+            redBox.style.border = '2px dashed #e74c3c';
+            redBox.style.backgroundColor = 'rgba(231, 76, 60, 0.18)';
+            redBox.style.pointerEvents = 'none';
+            
+            // Set bounds relative to parent .form-container window exactly
+            redBox.style.left = `${left + 10}px`;   
+            redBox.style.top = `${top + 10}px`;     
+            redBox.style.width = `${right - left}px`;
+            redBox.style.height = `${bottom - top}px`;
+            
+            document.querySelector('.form-container').appendChild(redBox);
+        }
+
+        function removeRedBox() {
+            if (redBox) {
+                redBox.remove();
+                redBox = null;
+            }
+        }
+
+        function highlightCorrectBox(fieldName) {
+            const areaTarget = Array.from(document.querySelectorAll('area')).find(area => area.dataset.box === fieldName);
+            if (areaTarget) {
+                createRedBox(areaTarget.coords);
+                
+                // Auto Scroll to position target bounds softly within view viewport
+                const [left, top] = areaTarget.coords.split(',').map(Number);
+                document.querySelector('.form-container').scrollTo({
+                    top: top - 50,
+                    behavior: 'smooth'
+                });
+
+                // Performance flash alerts tracking animation
+                let flashCycle = 0;
+                const flashTimer = setInterval(() => {
+                    if (redBox) redBox.style.opacity = (redBox.style.opacity === '0' ? '1' : '0');
+                    if (++flashCycle > 5) {
+                        clearInterval(flashTimer);
+                        if (redBox) redBox.style.opacity = '1';
+                    }
+                }, 150);
+            }
+        }
+
+        // Image Map Listeners Initialization
+        document.querySelectorAll('area').forEach(area => {
+            area.addEventListener('click', function (e) {
+                e.preventDefault();
+                if (gameScreen.classList.contains('active')) {
+                    checkBoxSelection(this.dataset.box, e);
+                }
+            });
+
+            area.addEventListener('mouseover', function () {
+                if (gameScreen.classList.contains('active')) {
+                    createRedBox(this.coords);
+                }
+            });
+
+            area.addEventListener('mouseout', function () {
+                removeRedBox();
+            });
+        });
+    });
+    </script>
+</body>
+</html>
